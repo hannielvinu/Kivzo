@@ -1,0 +1,73 @@
+# KIVZO information-flow policy
+#
+# For each sensitive tool argument, what is allowed depending on the INTEGRITY of the value
+# that fills it:
+#   allow    - accept
+#   endorse  - accept only if the named corroborator confirms it against a trusted record
+#   approve  - ask the human (one explained approval card)
+#   block    - refuse and raise an alert
+#
+# on_fail      - what happens when corroboration fails (block | approve | override)
+#                override = replace the value with the trusted record's value and alert
+# pc_untrusted - what happens when the DECISION to make this call depends on untrusted data
+#                (the call came from injected content, or sits inside a branch whose condition
+#                came from untrusted data)
+# sink         - confidentiality rule: data flowing into this call may not exceed the
+#                destination's clearance (recipient clearance, or a fixed maximum)
+
+version: 1
+unknown_tool: block
+
+tools:
+  transfer_money:
+    pc_untrusted: block
+    args:
+      to_iban: {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: endorse, UNTRUSTED: endorse, corroborate: vendor_iban, on_fail: override}
+      amount:  {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: endorse, UNTRUSTED: endorse, corroborate: po_amount_within_cap, on_fail: approve}
+      vendor:  {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: endorse, UNTRUSTED: endorse, corroborate: known_vendor, on_fail: block}
+      memo:    {default: allow}
+
+  send_email:
+    pc_untrusted: approve
+    sink: {recipient_arg: to, data_args: [subject, body, attachment]}
+    args:
+      to:         {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: endorse, UNTRUSTED: endorse, corroborate: known_contact, on_fail: approve}
+      subject:    {default: allow}
+      body:       {default: allow}
+      attachment: {default: allow}
+
+  read_internal_file:
+    pc_untrusted: block
+    args:
+      path: {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: endorse, UNTRUSTED: endorse, corroborate: shareable_doc, on_fail: block}
+
+  fetch_web:
+    pc_untrusted: allow
+    sink: {max_confidentiality: PUBLIC, data_args: [url]}     # the EchoLeak rule: nothing non-public leaves in a URL
+    args:
+      url: {default: allow}
+
+  device_control:
+    pc_untrusted: block
+    pc_allow_when: {device: [heater]}                          # low-risk device may run inside an untrusted branch
+    args:
+      device: {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: block, UNTRUSTED: block}
+      action: {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: block, UNTRUSTED: block}
+      at:     {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: endorse, UNTRUSTED: endorse, corroborate: time_sanity, on_fail: approve}
+
+  write_repo_file:
+    pc_untrusted: block
+    args:
+      path:    {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: allow, UNTRUSTED: block}
+      content: {USER: allow, TRUSTED_SYSTEM: allow, INTERNAL: allow, UNTRUSTED: approve}
+
+  create_issue:
+    pc_untrusted: approve
+    sink: {max_confidentiality: INTERNAL, data_args: [title, body]}
+    args:
+      title: {default: allow}
+      body:  {default: allow}
+
+# Non-sensitive tools (reads, summarise, notes, tests) are allowed by default.
+# They still produce labelled outputs, so anything they return keeps its provenance.
+non_sensitive_default: allow
