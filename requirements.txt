@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn>=0.27
+pydantic>=2.6
+pyyaml>=6.0
+matplotlib>=3.8
+google-genai>=1.0.0
+pytest>=8.0
+# optional: industry classifier for the prompt-shield baseline (set KIVZO_SHIELD=protectai)
+# transformers
+# torch
