@@ -49,6 +49,7 @@ $("#btn-sound").addEventListener("click", () => { S.sound = !S.sound; $("#btn-so
 document.querySelectorAll("#tabs button").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.tab)));
 function showTab(name) {
   document.querySelectorAll("#tabs button").forEach((x) => x.classList.toggle("active", x.dataset.tab === name));
+  document.querySelectorAll(".subtab-item").forEach((x) => x.classList.toggle("active", (x.getAttribute("onclick") || "").includes(name)));
   document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("active", x.id === `tab-${name}`));
   if (name === "trust") loadTrust();
 }
