@@ -1,6 +1,6 @@
 # KIVZO — Provenance-Aware Defence for Tool-Using AI Agents
 
-**Future Forge Buildathon 2026 · Track AG03 — The Agent That Survives a Poisoned Tool**
+**The Agent That Survives a Poisoned Tool**
 
 KIVZO is a real-time security framework that defends AI agents against prompt injection attacks embedded in emails, documents, web pages, and sub-agent outputs. Unlike keyword blocklists, KIVZO tracks *where every value came from* and enforces policy on that lineage — so an attacker cannot trick the agent by rephrasing, translating, or indirecting an instruction.
 
@@ -12,7 +12,7 @@ KIVZO is a real-time security framework that defends AI agents against prompt in
 python run.py
 ```
 
-Open `http://localhost:8000` — judges can scan the QR code on the page and attack from their phone in real time.
+Open `http://localhost:8000` — can scan the QR code on the page and attack from their phone in real time.
 
 ---
 
@@ -166,4 +166,3 @@ This gives KIVZO a 97% task completion rate vs 71% for strict IFC, while keeping
 ## Author
 
 **Hanniel Vinu**
-Future Forge Buildathon 2026 · VELS University Thiruvanmiyur Campus
